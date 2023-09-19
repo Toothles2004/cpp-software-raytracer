@@ -64,7 +64,7 @@ namespace dae
 
 	//+++++++++++++++++++++++++++++++++++++++++
 	//WEEK 1 Test Scene
-	class Scene_W1 final : public Scene
+	/*class Scene_W1 final : public Scene
 	{
 	public:
 		Scene_W1() = default;
@@ -76,5 +76,5 @@ namespace dae
 		Scene_W1& operator=(Scene_W1&&) noexcept = delete;
 
 		void Initialize() override;
-	};
+	};*/
 }
