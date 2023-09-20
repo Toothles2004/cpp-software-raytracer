@@ -36,7 +36,6 @@ void Renderer::Render(Scene* pScene) const
 		{
 			ColorRGB finalColor{};
 			float screenSpaceX = ((2.0f * ((static_cast<float>(px) + 0.5f) / static_cast<float>(m_Width))) - 1.0f) * aspectRatio;
-			//float screenSpaceY = ((1.0f - 2.0f * (static_cast<float>(py) + 0.5f)) / (static_cast<float>(m_Height)));
 			float screenSpaceY = (1.0f - (2.0f * ((static_cast<float>(py) + 0.5f) / static_cast<float>(m_Height))));
 			Vector3 rayDirection{ screenSpaceX, screenSpaceY, 1.0f};
 			rayDirection.Normalize();
@@ -45,11 +44,16 @@ void Renderer::Render(Scene* pScene) const
 
 			HitRecord closestHit{};
 
-			pScene->GetClosestHit(hitRay, closestHit);
+			Plane testPlane{ {0.f, -50.f, 0.f}, {0.f, 1.f, 0.f}, 0 };
+			GeometryUtils::HitTest_Plane(testPlane, hitRay, closestHit);
+			//pScene->GetClosestHit(hitRay, closestHit);
 
 			if (closestHit.didHit)
 			{
-				finalColor = materials[closestHit.materialIndex]->Shade();
+				const float scaled_t = closestHit.t / 500.f;
+				finalColor = { scaled_t, scaled_t, scaled_t };
+
+				//finalColor = materials[closestHit.materialIndex]->Shade();
 				//const float scaled_t = (closestHit.t - 50.0f) / 40.0f;
 				//finalColor = { scaled_t, scaled_t , scaled_t };
 			}
