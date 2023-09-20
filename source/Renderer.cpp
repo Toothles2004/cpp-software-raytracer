@@ -45,13 +45,13 @@ void Renderer::Render(Scene* pScene) const
 
 			HitRecord closestHit{};
 
-			GeometryUtils::HitTest_Sphere(testSphere, hitRay, closestHit);
+			pScene->GetClosestHit(hitRay, closestHit);
 
 			if (closestHit.didHit)
 			{
-				//finalColor = materials[closestHit.materialIndex]->Shade();
-				const float scaled_t = (closestHit.t - 50.0f) / 40.0f;
-				finalColor = { scaled_t, scaled_t , scaled_t };
+				finalColor = materials[closestHit.materialIndex]->Shade();
+				//const float scaled_t = (closestHit.t - 50.0f) / 40.0f;
+				//finalColor = { scaled_t, scaled_t , scaled_t };
 			}
 
 			//Update Color in Buffer
