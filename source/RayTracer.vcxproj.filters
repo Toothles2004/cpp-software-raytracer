@@ -59,6 +59,9 @@
     <ClInclude Include="Scene_W1.h">
       <Filter>Misc\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="Scene_W2.h">
+      <Filter>Misc\Scenes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -79,6 +82,9 @@
       <Filter>Misc</Filter>
     </ClCompile>
     <ClCompile Include="Scene_W1.cpp">
+      <Filter>Misc\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene_W2.cpp">
       <Filter>Misc\Scenes</Filter>
     </ClCompile>
   </ItemGroup>
