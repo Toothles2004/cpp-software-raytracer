@@ -33,5 +33,5 @@ void Scene_W2::Initialize()
     AddSphere({ 1.75f, 3.f, 0.f }, .75f, matId_Solid_Blue);
 
     //Light
-    AddPointLight({ 0.f, 35.f, -5.f }, 70.f, dae::colors::White);
+    AddPointLight({ 0.f, 5.f, -5.f }, 70.f, dae::colors::White);
 }

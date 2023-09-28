@@ -20,25 +20,33 @@ namespace dae
 
 
 		Vector3 origin{};
-		float fovAngle{90.f};
+		float fovAngle{45.f};
 
-		Vector3 forward{Vector3::UnitZ};
-		Vector3 up{Vector3::UnitY};
-		Vector3 right{Vector3::UnitX};
+		//Vector3 forward{Vector3::UnitZ};
+		Vector3 forward{ 0.266f, -0.453f, 0.860f };
+		Vector3 up{ Vector3::UnitY };
+		Vector3 right{ Vector3::UnitX };
 
 		float totalPitch{0.f};
 		float totalYaw{0.f};
 
 		Matrix cameraToWorld{};
 
-		float fov{ std::atanf(fovAngle) };
+		float fov{ std::tanf(TO_RADIANS*(fovAngle/2.f)) };
 
 
 		Matrix CalculateCameraToWorld()
 		{
 			//todo: W2
-			assert(false && "Not Implemented Yet");
-			return {};
+			right = Vector3::Cross(Vector3::UnitY, forward);
+			right.Normalize();
+
+			up = Vector3::Cross(forward, right);
+			up.Normalize();
+
+			cameraToWorld = { right, up, forward, origin };
+
+			return cameraToWorld;
 		}
 
 		void Update(Timer* pTimer)

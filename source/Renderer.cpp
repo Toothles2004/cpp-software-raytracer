@@ -32,6 +32,8 @@ void Renderer::Render(Scene* pScene) const
 
 	const float fov{ camera.fov };
 
+	camera.CalculateCameraToWorld();
+
 	for (int px{}; px < m_Width; ++px)
 	{
 		for (int py{}; py < m_Height; ++py)
@@ -41,7 +43,8 @@ void Renderer::Render(Scene* pScene) const
 			const float screenSpaceX = ((2.0f * ((px + 0.5f) / m_Width)) - 1.0f) * aspectRatio * fov;
 			const float screenSpaceY = (1.0f - (2.0f * ((py + 0.5f) / m_Height))) * fov;
 			
-			Vector3 rayDirection{ camera.forward + (camera.right * screenSpaceX) + (camera.up * screenSpaceY)};
+			Vector3 rayDirection{ screenSpaceX, screenSpaceY, 1.f};
+			rayDirection = camera.cameraToWorld.TransformVector(rayDirection);
 			rayDirection.Normalize();
 
 			Ray hitRay{ camera.origin, rayDirection };
