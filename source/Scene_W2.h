@@ -1,13 +1,6 @@
 #pragma once
 #include "Scene.h"
 
-//Forward Declarations
-class Timer;
-class Material;
-struct Plane;
-struct Sphere;
-struct Light;
-
 class Scene_W2 final : public dae::Scene
 {
 public:

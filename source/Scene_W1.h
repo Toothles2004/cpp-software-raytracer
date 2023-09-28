@@ -3,13 +3,6 @@
 
 namespace dae
 {
-	//Forward Declarations
-	class Timer;
-	class Material;
-	struct Plane;
-	struct Sphere;
-	struct Light;
-
 	class Scene_W1 final : public Scene
 	{
 	public:

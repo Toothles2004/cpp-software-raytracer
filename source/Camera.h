@@ -31,6 +31,8 @@ namespace dae
 
 		Matrix cameraToWorld{};
 
+		float fov{ std::atanf(fovAngle) };
+
 
 		Matrix CalculateCameraToWorld()
 		{
@@ -41,6 +43,7 @@ namespace dae
 
 		void Update(Timer* pTimer)
 		{
+			float initFovAngle{ fovAngle };
 			const float deltaTime = pTimer->GetElapsed();
 
 			//Keyboard Input
@@ -51,6 +54,10 @@ namespace dae
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
 
+			if(std::abs(initFovAngle - fovAngle) >= 0.00001f)
+			{
+				fov = std::atanf(fovAngle);
+			}
 			//todo: W2
 			//assert(false && "Not Implemented Yet");
 		}

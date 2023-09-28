@@ -30,16 +30,16 @@ void Renderer::Render(Scene* pScene) const
 	const float aspectRatio = static_cast<float>(m_Width) / m_Height;
 	Sphere testSphere{ {0.0f,0.0f,100.0f}, 50.0f, 0 };
 
+	const float fov{ camera.fov };
+
 	for (int px{}; px < m_Width; ++px)
 	{
 		for (int py{}; py < m_Height; ++py)
 		{
 			ColorRGB finalColor{};
 
-			float fov{ std::tanf(camera.fovAngle)};
-
-			float screenSpaceX = ((2.0f * ((px + 0.5f) / m_Width)) - 1.0f) * aspectRatio * fov;
-			float screenSpaceY = (1.0f - (2.0f * ((py + 0.5f) / m_Height))) * fov;
+			const float screenSpaceX = ((2.0f * ((px + 0.5f) / m_Width)) - 1.0f) * aspectRatio * fov;
+			const float screenSpaceY = (1.0f - (2.0f * ((py + 0.5f) / m_Height))) * fov;
 			
 			Vector3 rayDirection{ camera.forward + (camera.right * screenSpaceX) + (camera.up * screenSpaceY)};
 			rayDirection.Normalize();
