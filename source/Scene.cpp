@@ -41,8 +41,17 @@ namespace dae {
 
 	bool Scene::DoesHit(const Ray& ray) const
 	{
+		HitRecord closestHit{};
+
 		//todo W3
-		assert(false && "No Implemented Yet!");
+		for (const auto& sphere : m_SphereGeometries)
+		{
+			if (GeometryUtils::HitTest_Sphere(sphere, ray, closestHit)) return true;
+		}
+		for (const auto& plane : m_PlaneGeometries)
+		{
+			if(GeometryUtils::HitTest_Plane(plane, ray, closestHit)) return true;
+		}
 		return false;
 	}
 

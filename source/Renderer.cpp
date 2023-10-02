@@ -40,6 +40,7 @@ void Renderer::Render(Scene* pScene) const
 		{
 			ColorRGB finalColor{};
 
+			//calculations for rayDirection to determine the hitRay
 			const float screenSpaceX = ((2.0f * ((px + 0.5f) / m_Width)) - 1.0f) * aspectRatio * fov;
 			const float screenSpaceY = (1.0f - (2.0f * ((py + 0.5f) / m_Height))) * fov;
 			
@@ -49,6 +50,7 @@ void Renderer::Render(Scene* pScene) const
 
 			Ray hitRay{ camera.origin, rayDirection };
 
+			//calculate closest hit to visualize the objects in 3D space
 			HitRecord closestHit{};
 
 			Plane testPlane{ {0.f, -50.f, 0.f}, {0.f, 1.f, 0.f}, 0 };
@@ -58,6 +60,22 @@ void Renderer::Render(Scene* pScene) const
 			if (closestHit.didHit)
 			{
 				finalColor = materials[closestHit.materialIndex]->Shade();
+			}
+
+			Vector3 rayOrigin{ closestHit.origin };
+			rayOrigin += closestHit.normal * 0.0001f;
+
+			for(const auto& light : lights)
+			{
+				Vector3 directionToLight = LightUtils::GetDirectionToLight(light, rayOrigin);
+				const float distanceToLight = directionToLight.Normalize();
+
+				Ray lightRay{ rayOrigin, directionToLight, 0.0001f, distanceToLight };
+
+				if (pScene->DoesHit(lightRay))
+				{
+					finalColor *= 0.5f;
+				}
 			}
 
 			//Update Color in Buffer
