@@ -11,8 +11,9 @@
 #include "Timer.h"
 #include "Renderer.h"
 #include "Scene.h"
-//#include "Scene_W1.h"
+#include "Scene_W1.h"
 #include "Scene_W2.h"
+#include "Scene_W3.h"
 
 using namespace dae;
 
@@ -48,7 +49,8 @@ int main(int argc, char* args[])
 	const auto pRenderer = new Renderer(pWindow);
 
 	//const auto pScene = new Scene_W1();
-	const auto pScene = new Scene_W2();
+	//const auto pScene = new Scene_W2();
+	const auto pScene = new Scene_W3;
 	pScene->Initialize();
 
 	//Start loop

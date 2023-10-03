@@ -33,13 +33,14 @@ namespace dae
 					return false;
 				}
 			}
-			if (t > ray.max)
+			if (t > ray.max || t >= hitRecord.t)
 			{
 				return false;
 			}
-			if (t >= hitRecord.t)
+
+			if (ignoreHitRecord)
 			{
-				return false;
+				return true;
 			}
 
 			hitRecord.t = t;

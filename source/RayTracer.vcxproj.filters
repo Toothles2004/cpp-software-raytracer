@@ -3,7 +3,8 @@
   <ItemGroup>
     <Filter Include="Math">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <Extensions>
+      </Extensions>
     </Filter>
     <Filter Include="Misc">
       <UniqueIdentifier>{72056cb6-72a2-42b7-b05e-376f1ddd957e}</UniqueIdentifier>
@@ -62,6 +63,9 @@
     <ClInclude Include="Scene_W2.h">
       <Filter>Misc\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="Scene_W3.h">
+      <Filter>Misc\Scenes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -85,6 +89,9 @@
       <Filter>Misc\Scenes</Filter>
     </ClCompile>
     <ClCompile Include="Scene_W2.cpp">
+      <Filter>Misc\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene_W3.cpp">
       <Filter>Misc\Scenes</Filter>
     </ClCompile>
   </ItemGroup>
