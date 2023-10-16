@@ -69,47 +69,60 @@ namespace dae
 				return;
 			}
 
-
 			//Calculates the forward and right vector for camera movement with Keyboard input
-			origin += moveSpeed *																//multiply the movement vectors with the speed
-				deltaTime *																		
+			origin += moveSpeed * deltaTime *													//multiply forward and right vector with speed
 				(
-					((pKeyboardState[SDL_SCANCODE_UP] | pKeyboardState[SDL_SCANCODE_W]) -        
-					(pKeyboardState[SDL_SCANCODE_DOWN] | pKeyboardState[SDL_SCANCODE_S])) * 
-					forward +																	//calculates the forward movement vector
-					((pKeyboardState[SDL_SCANCODE_D] | pKeyboardState[SDL_SCANCODE_RIGHT]) -		
+					((pKeyboardState[SDL_SCANCODE_UP] | pKeyboardState[SDL_SCANCODE_W]) -       //calculates the forward movement vector
+					(pKeyboardState[SDL_SCANCODE_DOWN] | pKeyboardState[SDL_SCANCODE_S])) *		
+					forward +																	
+					((pKeyboardState[SDL_SCANCODE_D] | pKeyboardState[SDL_SCANCODE_RIGHT]) -	//calculates the horizontal movement vector
 					(pKeyboardState[SDL_SCANCODE_A] | pKeyboardState[SDL_SCANCODE_LEFT])) *		
-					right																		//calculates the horizontal movement vector
-				);																				
-
-			//Calculates forward and up vector for camera movement when LMB and/or RMB are pressed
-			origin += (moveSpeed / 2) * 
-				deltaTime * 
-				(
-					(static_cast<bool>(mouseState & SDL_BUTTON_LMASK) * 
-					mouseY * 
-					(static_cast<bool>(mouseState & SDL_BUTTON_RMASK) - 1)) *					// RMB not pressed gives forward movement, when pressed it stops forward movement
-					forward +
-					(static_cast<bool>(mouseState & SDL_BUTTON_RMASK) & static_cast<bool>(mouseState & SDL_BUTTON_LMASK)) *
-					-mouseY *
-					up
+					right																		
 				);
 
-			//Calculates camera's forward vector rotation when LMB and/or RMB are pressed
-			totalPitch += rotateSpeed * 
-				deltaTime * 
-				(
-					static_cast<bool>(mouseState & SDL_BUTTON_RMASK) *
-					(static_cast<bool>(mouseState & SDL_BUTTON_LMASK) - 1)  *
-					-mouseY
-				);
+			////Calculates forward and up vector for camera movement when LMB and/or RMB are pressed
+			//origin += (moveSpeed / 2) * 
+			//	deltaTime * 
+			//	(
+			//		(static_cast<bool>(mouseState & SDL_BUTTON_LMASK) * 
+			//		mouseY * 
+			//		(static_cast<bool>(mouseState & SDL_BUTTON_RMASK) - 1)) *					// RMB not pressed gives forward movement, when pressed it stops forward movement
+			//		forward +
+			//		(static_cast<bool>(mouseState & SDL_BUTTON_RMASK) & static_cast<bool>(mouseState & SDL_BUTTON_LMASK)) *
+			//		-mouseY *
+			//		up
+			//	);
 
-			totalYaw += rotateSpeed *
+			////Calculates camera's forward vector rotation when LMB and/or RMB are pressed
+			//totalPitch += rotateSpeed * 
+			//	deltaTime * 
+			//	(
+			//		static_cast<bool>(mouseState & SDL_BUTTON_RMASK) *
+			//		(static_cast<bool>(mouseState & SDL_BUTTON_LMASK) - 1)  *
+			//		-mouseY
+			//	);
+
+			/*totalYaw += rotateSpeed *
 				deltaTime *
 				(
 					(static_cast<bool>(mouseState & SDL_BUTTON_RMASK) ^ static_cast<bool>(mouseState & SDL_BUTTON_LMASK)) *
 					mouseX
-				);
+				);*/
+
+			if((mouseState & SDL_BUTTON_RMASK) && (mouseState & SDL_BUTTON_LMASK))
+			{
+				origin += (moveSpeed / 2) * deltaTime * mouseY * Vector3::UnitY;		//moves up and down on Y axis
+			}
+			else if(mouseState & SDL_BUTTON_RMASK)
+			{
+				totalYaw += rotateSpeed * deltaTime * mouseX;							//turns around the Y axis (horizontally)
+				totalPitch += rotateSpeed * deltaTime * mouseY;							//turns around the X axis (vertically)
+			}
+			else if(mouseState & SDL_BUTTON_LMASK)
+			{
+				origin += (moveSpeed / 2) * deltaTime * -mouseY * forward;				//determines forward movement
+				totalYaw += rotateSpeed * deltaTime * mouseX;							//turns around the y axis (horizontally)
+			}
 
 			const Matrix finalRotation{Matrix::CreateRotation(totalPitch, totalYaw, 0.f)};
 

@@ -65,18 +65,22 @@ void Renderer::Render(Scene* pScene) const
 			Vector3 rayOrigin{ closestHit.origin };
 			rayOrigin += closestHit.normal * 0.0001f;
 
-			for(const auto& light : lights)
+			if(m_ShadowEnabled)
 			{
-				Vector3 directionToLight = LightUtils::GetDirectionToLight(light, rayOrigin);
-				const float distanceToLight = directionToLight.Normalize();
-
-				Ray lightRay{ rayOrigin, directionToLight, 0.0001f, distanceToLight };
-
-				if (pScene->DoesHit(lightRay))
+				for (const auto& light : lights)
 				{
-					finalColor *= 0.5f;
+					Vector3 directionToLight = LightUtils::GetDirectionToLight(light, rayOrigin);
+					const float distanceToLight = directionToLight.Normalize();
+
+					Ray lightRay{ rayOrigin, directionToLight, 0.0001f, distanceToLight };
+
+					if (pScene->DoesHit(lightRay))
+					{
+						finalColor *= 0.5f;
+					}
 				}
 			}
+			
 
 			//Update Color in Buffer
 			finalColor.MaxToOne();
@@ -96,4 +100,9 @@ void Renderer::Render(Scene* pScene) const
 bool Renderer::SaveBufferToImage() const
 {
 	return SDL_SaveBMP(m_pBuffer, "RayTracing_Buffer.bmp");
+}
+
+void Renderer::CycleLightingMode()
+{
+	m_CurrentLightingMode = static_cast<LightingMode>((static_cast<int>(m_CurrentLightingMode) + 1) % static_cast<int>(LightingMode::number));
 }
