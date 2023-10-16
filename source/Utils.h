@@ -63,7 +63,6 @@ namespace dae
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//todo W1
-
 			float t = Vector3::Dot((plane.origin - ray.origin), plane.normal) / Vector3::Dot(ray.direction, plane.normal);
 			
 			if (t < ray.min)
@@ -81,7 +80,7 @@ namespace dae
 
 			hitRecord.t = t;
 			hitRecord.origin = ray.origin + (ray.direction * t);
-			hitRecord.normal = (hitRecord.origin - plane.origin).Normalized();
+			hitRecord.normal = plane.normal;
 			hitRecord.materialIndex = plane.materialIndex;
 			hitRecord.didHit = true;
 
@@ -137,8 +136,13 @@ namespace dae
 		inline ColorRGB GetRadiance(const Light& light, const Vector3& target)
 		{
 			//todo W3
-			assert(false && "No Implemented Yet!");
-			return {};
+
+			if(light.type == LightType::Directional)
+			{
+				return light.color * light.intensity;
+			}
+
+			return light.color * (light.intensity / (light.origin - target).SqrMagnitude());
 		}
 	}
 

@@ -1,4 +1,6 @@
 #pragma once
+#include <SDL_stdinc.h>
+
 #include "Math.h"
 #include "DataTypes.h"
 #include "BRDFs.h"
@@ -60,12 +62,11 @@ namespace dae
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
 			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			return {BRDF::Lambert(m_DiffuseReflectance, m_DiffuseColor)};
 		}
 
 	private:
-		ColorRGB m_DiffuseColor{colors::White};
+		ColorRGB m_DiffuseColor{colors::White}; //cd
 		float m_DiffuseReflectance{1.f}; //kd
 	};
 #pragma endregion
@@ -85,8 +86,8 @@ namespace dae
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
 			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			return { BRDF::Lambert(m_DiffuseReflectance, m_DiffuseColor)
+					+ BRDF::Phong(m_SpecularReflectance, m_PhongExponent, l, -v, hitRecord.normal)};
 		}
 
 	private:
@@ -110,8 +111,23 @@ namespace dae
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
 			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			const ColorRGB f0 = (abs(m_Metalness) <= 0.0001f) ? ColorRGB(0.04f, 0.04f, 0.04f) : m_Albedo;
+			const Vector3 halfVector{ (-v + l).Normalized() };
+
+			ColorRGB fresnel{ BRDF::FresnelFunction_Schlick(halfVector, -v, f0) };
+
+			ColorRGB dfg = 
+				fresnel *
+				BRDF::NormalDistribution_GGX(hitRecord.normal, halfVector, m_Roughness)*
+				BRDF::GeometryFunction_Smith(hitRecord.normal, -v, l, m_Roughness);
+
+			ColorRGB specular = (dfg) / (4*(Vector3::Dot(-v, hitRecord.normal) * Vector3::Dot(l, hitRecord.normal)));
+
+			ColorRGB kd = (abs(m_Metalness) <= 0.0001f) ? ColorRGB(1, 1, 1) - fresnel : ColorRGB(0, 0,0);
+
+			ColorRGB diffuse = BRDF::Lambert(kd, m_Albedo);
+
+			return { diffuse + specular };
 		}
 
 	private:

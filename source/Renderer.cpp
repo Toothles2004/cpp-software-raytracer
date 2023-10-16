@@ -53,34 +53,62 @@ void Renderer::Render(Scene* pScene) const
 			//calculate closest hit to visualize the objects in 3D space
 			HitRecord closestHit{};
 
-			Plane testPlane{ {0.f, -50.f, 0.f}, {0.f, 1.f, 0.f}, 0 };
+			//Plane testPlane{ {0.f, -50.f, 0.f}, {0.f, 1.f, 0.f}, 0 };
 			
 			pScene->GetClosestHit(hitRay, closestHit);
 
 			if (closestHit.didHit)
 			{
-				finalColor = materials[closestHit.materialIndex]->Shade();
-			}
+				Vector3 rayOrigin{ closestHit.origin };
+				rayOrigin += closestHit.normal * 0.0001f;
 
-			Vector3 rayOrigin{ closestHit.origin };
-			rayOrigin += closestHit.normal * 0.0001f;
-
-			if(m_ShadowEnabled)
-			{
 				for (const auto& light : lights)
 				{
 					Vector3 directionToLight = LightUtils::GetDirectionToLight(light, rayOrigin);
 					const float distanceToLight = directionToLight.Normalize();
-
-					Ray lightRay{ rayOrigin, directionToLight, 0.0001f, distanceToLight };
-
-					if (pScene->DoesHit(lightRay))
+					if (m_ShadowEnabled)
 					{
-						finalColor *= 0.5f;
+						Ray lightRay{ rayOrigin, directionToLight, 0.0001f, distanceToLight };
+
+						if (pScene->DoesHit(lightRay))
+						{
+							continue;
+						}
+					}
+
+					float observedArea{ Vector3::Dot(closestHit.normal, directionToLight) };
+
+					switch (m_CurrentLightingMode)
+					{
+					case dae::Renderer::LightingMode::observedArea:
+						if (observedArea > 0.f)
+						{
+							finalColor += observedArea * ColorRGB(1, 1, 1);
+						}
+						break;
+					case dae::Renderer::LightingMode::radiance:
+						finalColor += LightUtils::GetRadiance(light, closestHit.origin);
+						break;
+					case dae::Renderer::LightingMode::BRDF:
+						finalColor += materials[closestHit.materialIndex]->Shade(closestHit, directionToLight, rayDirection);
+						break;
+					case dae::Renderer::LightingMode::combined:
+						if (observedArea > 0.f)
+						{
+							finalColor +=
+								LightUtils::GetRadiance(light, closestHit.origin) *
+								materials[closestHit.materialIndex]->Shade(closestHit, directionToLight, rayDirection) *
+								observedArea;
+						}
+						
+						break;
+					case dae::Renderer::LightingMode::number:
+						break;
+					default:
+						break;
 					}
 				}
 			}
-			
 
 			//Update Color in Buffer
 			finalColor.MaxToOne();
