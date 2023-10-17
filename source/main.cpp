@@ -14,6 +14,7 @@
 #include "Scene_W1.h"
 #include "Scene_W2.h"
 #include "Scene_W3.h"
+#include "Scene_W4.h"
 
 using namespace dae;
 
@@ -50,7 +51,8 @@ int main(int argc, char* args[])
 
 	//const auto pScene = new Scene_W1();
 	//const auto pScene = new Scene_W2();
-	const auto pScene = new Scene_W3;
+	//const auto pScene = new Scene_W3();
+	const auto pScene = new Scene_W4();
 	pScene->Initialize();
 
 	//Start loop
@@ -76,9 +78,9 @@ int main(int argc, char* args[])
 			case SDL_KEYUP:
 				if(e.key.keysym.scancode == SDL_SCANCODE_X)
 					takeScreenshot = true;
-				if (e.key.keysym.scancode == SDL_SCANCODE_F2)
+				else if (e.key.keysym.scancode == SDL_SCANCODE_F2)
 					pRenderer->ToggleShadows();
-				if (e.key.keysym.scancode == SDL_SCANCODE_F3)
+				else if (e.key.keysym.scancode == SDL_SCANCODE_F3)
 					pRenderer->CycleLightingMode();
 				break;
 			}
