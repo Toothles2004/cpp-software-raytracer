@@ -104,20 +104,24 @@ namespace dae
 
 			const float det = Vector3::Dot(v0V1, pVec);
 
-			if (triangle.cullMode == TriangleCullMode::BackFaceCulling)
+			switch (triangle.cullMode)
 			{
+			case dae::TriangleCullMode::BackFaceCulling:
 				if (det < FLT_EPSILON)
-				{
 					return false;
-				}
-			}
-			else
-			{
+				break;
+			case dae::TriangleCullMode::FrontFaceCulling:
+				if (det > FLT_EPSILON)
+					return false;
+				break;
+			case dae::TriangleCullMode::NoCulling:
 				if (fabs(det) < FLT_EPSILON)
 				{
 					return false;
 				}
+				break;
 			}
+			
 			const float invDet = 1.f / det;
 			const float u = Vector3::Dot(ray.origin - triangle.v0, pVec) * invDet;
 			if (u < 0 || u > 1)

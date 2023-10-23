@@ -17,6 +17,7 @@ public:
 	void Update(dae::Timer* pTimer) override;
 
 private:
-	dae::TriangleMesh* m_pMesh{nullptr};
+	//std::vector<dae::TriangleMesh*> m_Meshes{};
+	dae::TriangleMesh* m_Meshes[3]{};
 };
 
