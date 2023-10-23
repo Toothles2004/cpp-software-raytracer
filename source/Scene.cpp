@@ -37,20 +37,34 @@ namespace dae {
 		{
 			GeometryUtils::HitTest_Plane(plane, ray, closestHit);
 		}
+		for (const auto& triangle : m_Triangles)
+		{
+			GeometryUtils::HitTest_Triangle(triangle, ray, closestHit);
+		}
+		for (const auto& triangleMesh : m_TriangleMeshGeometries)
+		{
+			GeometryUtils::HitTest_TriangleMesh(triangleMesh, ray, closestHit);
+		}
 	}
 
 	bool Scene::DoesHit(const Ray& ray) const
 	{
-		HitRecord closestHit{};
-
 		//todo W3
 		for (const auto& sphere : m_SphereGeometries)
 		{
-			if (GeometryUtils::HitTest_Sphere(sphere, ray, closestHit)) return true;
+			if (GeometryUtils::HitTest_Sphere(sphere, ray)) return true;
 		}
 		for (const auto& plane : m_PlaneGeometries)
 		{
-			if(GeometryUtils::HitTest_Plane(plane, ray, closestHit)) return true;
+			if (GeometryUtils::HitTest_Plane(plane, ray)) return true;
+		}
+		for (const auto& triangle : m_Triangles)
+		{
+			if (GeometryUtils::HitTest_Triangle(triangle, ray)) return true;
+		}
+		for (const auto& triangleMesh : m_TriangleMeshGeometries)
+		{
+			if (GeometryUtils::HitTest_TriangleMesh(triangleMesh, ray)) return true;
 		}
 		return false;
 	}

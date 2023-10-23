@@ -123,20 +123,40 @@ namespace dae
 
 		void CalculateNormals()
 		{
-			assert(false && "No Implemented Yet!");
+			normals.clear();
+			for(int index{}; index < static_cast<int>(indices.size()); index+=3)
+			{
+				Vector3 v0{ positions[indices[index]] };
+				Vector3 v1{ positions[indices[index+1]] };
+				Vector3 v2{ positions[indices[index+2]] };
+
+				Triangle triangle = { v0, v1, v2 };
+				normals.push_back(triangle.normal);
+			}
 		}
 
 		void UpdateTransforms()
 		{
-			assert(false && "No Implemented Yet!");
 			//Calculate Final Transform 
 			//const auto finalTransform = ...
+			Matrix finalTransform = scaleTransform * translationTransform * rotationTransform;
+
+			transformedPositions.clear();
+			transformedNormals.clear();
 
 			//Transform Positions (positions > transformedPositions)
 			//...
-
+			for (const auto& position : positions)
+			{
+				transformedPositions.push_back(finalTransform.TransformPoint(position));
+			}
+			
 			//Transform Normals (normals > transformedNormals)
 			//...
+			for (const auto& normal : normals)
+			{
+				transformedNormals.push_back(finalTransform.TransformVector(normal));
+			}
 		}
 	};
 #pragma endregion

@@ -14,8 +14,9 @@ public:
 	Scene_W4& operator=(Scene_W4&&) noexcept = delete;
 
 	void Initialize() override;
+	void Update(dae::Timer* pTimer) override;
 
 private:
-	std::vector<dae::Triangle> m_Triangles;
+	dae::TriangleMesh* m_pMesh{nullptr};
 };
 

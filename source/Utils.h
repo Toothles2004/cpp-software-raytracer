@@ -98,8 +98,57 @@ namespace dae
 		inline bool HitTest_Triangle(const Triangle& triangle, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//todo W5
-			assert(false && "No Implemented Yet!");
-			return false;
+			const Vector3 v0V1 = triangle.v1 - triangle.v0;
+			const Vector3 v0V2 = triangle.v2 - triangle.v0;
+			const Vector3 pVec = Vector3::Cross(ray.direction, v0V2);
+
+			const float det = Vector3::Dot(v0V1, pVec);
+
+			if (triangle.cullMode == TriangleCullMode::BackFaceCulling)
+			{
+				if (det < FLT_EPSILON)
+				{
+					return false;
+				}
+			}
+			else
+			{
+				if (fabs(det) < FLT_EPSILON)
+				{
+					return false;
+				}
+			}
+			const float invDet = 1.f / det;
+			const float u = Vector3::Dot(ray.origin - triangle.v0, pVec) * invDet;
+			if (u < 0 || u > 1)
+			{
+				return false;
+			}
+			const Vector3 qVec = Vector3::Cross(ray.origin - triangle.v0, v0V1);
+			const float v = Vector3::Dot(ray.direction, qVec) * invDet;
+			if (v < 0 || u + v >1)
+			{
+				return false;
+			}
+			const float t = Vector3::Dot(v0V2, qVec) * invDet;
+			
+			if ((t > ray.max) || (t < ray.min))
+			{
+				return false;
+			}
+			if (ignoreHitRecord != true)
+			{
+				if (t > hitRecord.t)
+				{
+					return false;
+				}
+				hitRecord.t = t;
+				hitRecord.didHit = true;
+				hitRecord.materialIndex = triangle.materialIndex;
+				hitRecord.normal = triangle.normal;
+				hitRecord.origin = ray.origin + t * ray.direction;
+			}
+			return true;
 		}
 
 		inline bool HitTest_Triangle(const Triangle& triangle, const Ray& ray)
@@ -112,8 +161,28 @@ namespace dae
 		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//todo W5
-			assert(false && "No Implemented Yet!");
-			return false;
+
+			Triangle triangle{};
+			triangle.cullMode = mesh.cullMode;
+			triangle.materialIndex = mesh.materialIndex;
+
+			for(int index{}; index < static_cast<int>(mesh.indices.size()); index += 3)
+			{
+				Vector3 v0{ mesh.transformedPositions[mesh.indices[index]] };
+				Vector3 v1{ mesh.transformedPositions[mesh.indices[index+1]] };
+				Vector3 v2{ mesh.transformedPositions[mesh.indices[index+2]] };
+
+				Vector3 normal{ mesh.transformedNormals[index/3] };
+
+				triangle.v0 = v0; 
+				triangle.v1 = v1; 
+				triangle.v2 = v2;
+
+				triangle.normal = normal; 
+
+				HitTest_Triangle(triangle, ray, hitRecord, ignoreHitRecord);
+			}
+			return hitRecord.didHit;
 		}
 
 		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray)
