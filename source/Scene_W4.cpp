@@ -37,16 +37,19 @@ void Scene_W4::Initialize()
 	m_Meshes[0] = AddTriangleMesh(dae::TriangleCullMode::BackFaceCulling, matLambert_White);
 	m_Meshes[0]->AppendTriangle(baseTriangle, true);
 	m_Meshes[0]->Translate({ -1.75f,4.5f,0.f });
+	m_Meshes[0]->UpdateAABB();
 	m_Meshes[0]->UpdateTransforms();
 
 	m_Meshes[1] = AddTriangleMesh(dae::TriangleCullMode::FrontFaceCulling, matLambert_White);
 	m_Meshes[1]->AppendTriangle(baseTriangle, true);
 	m_Meshes[1]->Translate({ 0.f,4.5f,0.f });
+	m_Meshes[1]->UpdateAABB();
 	m_Meshes[1]->UpdateTransforms();
 
 	m_Meshes[2] = AddTriangleMesh(dae::TriangleCullMode::NoCulling, matLambert_White);
 	m_Meshes[2]->AppendTriangle(baseTriangle, true);
 	m_Meshes[2]->Translate({ 1.75f,4.5f,0.f });
+	m_Meshes[2]->UpdateAABB();
 	m_Meshes[2]->UpdateTransforms();
 
 	AddPointLight(dae::Vector3{ 0.f, 5.f, 5.f }, 50.f, dae::ColorRGB{ 1.f, .61f, .45f }); //Backlight
@@ -73,7 +76,7 @@ void Scene_W4::Update(dae::Timer* pTimer)
 {
 	Scene::Update(pTimer);
 
-	const auto yawAngle = (cos(pTimer->GetTotal()) + 1.f) / 2.f * dae::PI_2;
+	const float yawAngle = (cos(pTimer->GetTotal()) + 1.f) / 2.f * dae::PI_2;
 	for(const auto mesh : m_Meshes)
 	{
 		mesh->RotateY(yawAngle);

@@ -5,7 +5,7 @@
 
 void Scene_W4_BunnyScene::Initialize()
 {
-	m_Camera.origin = { 0.f,1.f,-5.f };
+	m_Camera.origin = { 0.f,3.f,-9.f };
 	m_Camera.fovAngle = 45.f;
 
 	//Materials
@@ -56,10 +56,10 @@ void Scene_W4_BunnyScene::Initialize()
 		m_pMesh->indices);
 
 	//No need to Calculate the normals, these are calculated inside the ParseOBJ function
-	m_pMesh->UpdateTransforms();
 
 	m_pMesh->Scale({ 2.f,2.f,2.f });
-	m_pMesh->Translate({ .0f,0.f,0.f });
+	m_pMesh->UpdateAABB();
+	m_pMesh->UpdateTransforms();
 
 
 	//Light
@@ -71,7 +71,6 @@ void Scene_W4_BunnyScene::Initialize()
 void Scene_W4_BunnyScene::Update(dae::Timer* pTimer)
 {
 	Scene::Update(pTimer);
-
-	m_pMesh->RotateY(dae::PI_DIV_2 * pTimer->GetTotal());
+	m_pMesh->RotateY((cos(pTimer->GetTotal()) + 1.f) / 2.f * dae::PI_2);
 	m_pMesh->UpdateTransforms();
 }

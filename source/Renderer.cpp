@@ -28,11 +28,7 @@ void Renderer::Render(Scene* pScene) const
 {
 	Camera& camera = pScene->GetCamera();
 
-	auto& materials = pScene->GetMaterials();
-	auto& lights = pScene->GetLights();
-
 	const float aspectRatio = static_cast<float>(m_Width) / m_Height;
-	//Sphere testSphere{ {0.0f,0.0f,100.0f}, 50.0f, 0 };
 
 	const float fov{ camera.fov };
 
@@ -50,6 +46,9 @@ void Renderer::Render(Scene* pScene) const
 		});
 	
 	#else
+	auto& materials = pScene->GetMaterials();
+	auto& lights = pScene->GetLights();
+
 	for (int px{}; px < m_Width; ++px)
 	{
 		for (int py{}; py < m_Height; ++py)
@@ -140,8 +139,7 @@ void Renderer::Render(Scene* pScene) const
 	SDL_UpdateWindowSurface(m_pWindow);
 }
 
-void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float aspectRatio, const Matrix cameraToWorld,
-	const Vector3 cameraOrigin) const
+void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float aspectRatio, const Matrix& cameraToWorld, const Vector3 cameraOrigin) const
 {
 	auto materials{ pScene->GetMaterials() };
 	const uint32_t px{ pixelIndex % m_Width }, py{ pixelIndex / m_Width };
@@ -151,7 +149,6 @@ void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float 
 	float cy{ (1 - (2 * (ry / static_cast<float>(m_Height)))) * fov };
 
 	auto& lights = pScene->GetLights();
-	//Sphere testSphere{ {0.0f,0.0f,100.0f}, 50.0f, 0 };
 
 	ColorRGB finalColor{};
 

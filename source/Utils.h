@@ -161,10 +161,47 @@ namespace dae
 			return HitTest_Triangle(triangle, ray, temp, true);
 		}
 #pragma endregion
+
+#pragma region SlabTest
+		inline bool SlapTestTriangleMesh(const TriangleMesh& mesh, const Ray& ray)
+		{
+			float tmin = std::min(
+				(mesh.transformedMinAABB.x - ray.origin.x) / ray.direction.x,
+				(mesh.transformedMaxAABB.x - ray.origin.x) / ray.direction.x);
+			float tmax = std::max(
+				(mesh.transformedMinAABB.x - ray.origin.x) / ray.direction.x,
+				(mesh.transformedMaxAABB.x - ray.origin.x) / ray.direction.x);
+			tmin = std::max(
+				tmin,
+				std::min(
+					(mesh.transformedMinAABB.y - ray.origin.y) / ray.direction.y,
+					(mesh.transformedMaxAABB.y - ray.origin.y) / ray.direction.y));
+			tmax = std::min(
+				tmax,
+				std::max(
+					(mesh.transformedMinAABB.y - ray.origin.y) / ray.direction.y,
+					(mesh.transformedMaxAABB.y - ray.origin.y) / ray.direction.y));
+			tmin = std::max(
+				tmin,
+				std::min(
+					(mesh.transformedMinAABB.z - ray.origin.z) / ray.direction.z,
+					(mesh.transformedMaxAABB.z - ray.origin.z) / ray.direction.z));
+			tmax = std::min(
+				tmax,
+				std::max(
+					(mesh.transformedMinAABB.z - ray.origin.z) / ray.direction.z,
+					(mesh.transformedMaxAABB.z - ray.origin.z) / ray.direction.z));
+			return tmax > 0 && tmax >= tmin;
+		}
+#pragma endregion
 #pragma region TriangeMesh HitTest
 		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//todo W5
+			if(!SlapTestTriangleMesh(mesh, ray))
+			{
+				return false;
+			}
 
 			Triangle triangle{};
 			triangle.cullMode = mesh.cullMode;
@@ -184,7 +221,13 @@ namespace dae
 
 				triangle.normal = normal; 
 
-				HitTest_Triangle(triangle, ray, hitRecord, ignoreHitRecord);
+				if(HitTest_Triangle(triangle, ray, hitRecord, ignoreHitRecord))
+				{
+					if(ignoreHitRecord)
+					{
+						return true;
+					}
+				}
 			}
 			return hitRecord.didHit;
 		}
