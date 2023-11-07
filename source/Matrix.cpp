@@ -115,35 +115,59 @@ namespace dae {
 
 	Matrix Matrix::CreateRotationX(float pitch)
 	{
-		//todo W2
-		return {
-			Vector3{1,0,0},
-			Vector3{0, std::cosf(pitch), std::sinf(pitch)},
-			Vector3{0, -std::sinf(pitch), std::cosf(pitch)},
-			Vector3{0,0,1}
-		};
+		////todo W2
+		//return {
+		//	Vector4{1,0,0, 1},
+		//	Vector4{0, std::cosf(pitch), std::sinf(pitch), 1},
+		//	Vector4{0, -std::sinf(pitch), std::cosf(pitch), 1},
+		//	Vector4{0,0,1, 1},
+		//};
+		Matrix matrix{};
+
+		matrix[1][1] = cosf(pitch);
+		matrix[1][2] = -sinf(pitch);
+		matrix[2][1] = sinf(pitch);
+		matrix[2][2] = cosf(pitch);
+
+		return matrix;
 	}
 
 	Matrix Matrix::CreateRotationY(float yaw)
 	{
-		//todo W2
-		return {
-			Vector3{std::cosf(yaw),0,-std::sinf(yaw)},
-			Vector3{0, 1, 0},
-			Vector3{std::sinf(yaw), 0, std::cosf(yaw)},
-			Vector3{0,0,1}
-		};
+		////todo W2
+		//return {
+		//	Vector4{std::cosf(yaw),0,-std::sinf(yaw), 1},
+		//	Vector4{0, 1, 0, 1},
+		//	Vector4{std::sinf(yaw), 0, std::cosf(yaw), 1},
+		//	Vector4{0,0,1, 1}
+		//};
+		Matrix matrix{};
+
+		matrix[0][0] = cosf(yaw);
+		matrix[0][2] = -sinf(yaw);
+		matrix[2][0] = sinf(yaw);
+		matrix[2][2] = cosf(yaw);
+
+		return matrix;
 	}
 
 	Matrix Matrix::CreateRotationZ(float roll)
 	{
-		//todo W2
-		return {
-			Vector3{std::cosf(roll),std::sinf(roll),0},
-			Vector3{-std::sinf(roll), std::cosf(roll), 0},
-			Vector3{0, 0, 1},
-			Vector3{0,0,1}
-		};
+		////todo W2
+		//return {
+		//	Vector4{std::cosf(roll),std::sinf(roll),0, 1},
+		//	Vector4{-std::sinf(roll), std::cosf(roll), 0, 1},
+		//	Vector4{0, 0, 1, 1},
+		//	Vector4{0,0,1, 1}
+		//};
+		Matrix matrix{};
+
+		matrix[0][0] = cosf(roll);
+		matrix[0][1] = sinf(roll);
+		matrix[1][0] = -sinf(roll);
+		matrix[1][1] = cosf(roll);
+
+		return matrix;
 	}
 
 	Matrix Matrix::CreateRotation(const Vector3& r)
@@ -159,13 +183,20 @@ namespace dae {
 
 	Matrix Matrix::CreateScale(float sx, float sy, float sz)
 	{
-		//todo W2
-		return {
-			Vector3{sx, 0, 0},
-			Vector3{0, sy, 0},
-			Vector3{0, 0, sz},
-			Vector3{0, 0, 1},
-		};
+		////todo W2
+		//return {
+		//	Vector4{sx, 0, 0, 1},
+		//	Vector4{0, sy, 0, 1},
+		//	Vector4{0, 0, sz, 1},
+		//	Vector4{0, 0, 0, 1},
+		//};
+		Matrix matrix{};
+
+		matrix[0][0] = sx;
+		matrix[1][1] = sy;
+		matrix[2][2] = sz;
+
+		return matrix;
 	}
 
 	Matrix Matrix::CreateScale(const Vector3& s)

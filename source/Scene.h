@@ -62,20 +62,4 @@ namespace dae
 		Light* AddDirectionalLight(const Vector3& direction, float intensity, const ColorRGB& color);
 		unsigned char AddMaterial(Material* pMaterial);
 	};
-
-	//+++++++++++++++++++++++++++++++++++++++++
-	//WEEK 1 Test Scene
-	/*class Scene_W1 final : public Scene
-	{
-	public:
-		Scene_W1() = default;
-		~Scene_W1() override = default;
-
-		Scene_W1(const Scene_W1&) = delete;
-		Scene_W1(Scene_W1&&) noexcept = delete;
-		Scene_W1& operator=(const Scene_W1&) = delete;
-		Scene_W1& operator=(Scene_W1&&) noexcept = delete;
-
-		void Initialize() override;
-	};*/
 }

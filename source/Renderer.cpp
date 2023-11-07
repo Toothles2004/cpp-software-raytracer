@@ -27,6 +27,8 @@ Renderer::Renderer(SDL_Window * pWindow) :
 void Renderer::Render(Scene* pScene) const
 {
 	Camera& camera = pScene->GetCamera();
+	const auto& materials{ pScene->GetMaterials() };
+	const auto& lights = pScene->GetLights();
 
 	const float aspectRatio = static_cast<float>(m_Width) / m_Height;
 
@@ -34,20 +36,19 @@ void Renderer::Render(Scene* pScene) const
 
 	camera.CalculateCameraToWorld();
 	#if defined(PARALLEL_EXECUTION)
-	uint32_t amountOfPixels{ uint32_t(m_Width * m_Height) };
+	const uint32_t amountOfPixels{ uint32_t(m_Width * m_Height) };
 	std::vector<uint32_t> pixelIndices{};
 
 	pixelIndices.reserve(amountOfPixels);
 	for (uint32_t index{}; index < amountOfPixels; ++index) pixelIndices.emplace_back(index);
+	
 
 	std::for_each(std::execution::par, pixelIndices.begin(), pixelIndices.end(), [&](int index)
 		{
-			RenderPixel(pScene, index, fov, aspectRatio, camera.cameraToWorld, camera.origin);
+			RenderPixel(pScene, index, fov, aspectRatio, camera, lights, materials);
 		});
 	
 	#else
-	auto& materials = pScene->GetMaterials();
-	auto& lights = pScene->GetLights();
 
 	for (int px{}; px < m_Width; ++px)
 	{
@@ -139,16 +140,9 @@ void Renderer::Render(Scene* pScene) const
 	SDL_UpdateWindowSurface(m_pWindow);
 }
 
-void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float aspectRatio, const Matrix& cameraToWorld, const Vector3 cameraOrigin) const
+void Renderer::RenderPixel(const Scene* pScene, uint32_t pixelIndex, float fov, float aspectRatio, const Camera& camera, const std::vector<Light>& light, const std::vector<Material*>& material) const
 {
-	auto materials{ pScene->GetMaterials() };
 	const uint32_t px{ pixelIndex % m_Width }, py{ pixelIndex / m_Width };
-
-	float rx{ static_cast<float>(px) + 0.5f }, ry{ static_cast<float>(py) + 0.5f };
-	float cx{ (2 * (rx / static_cast<float>(m_Width)) - 1) };
-	float cy{ (1 - (2 * (ry / static_cast<float>(m_Height)))) * fov };
-
-	auto& lights = pScene->GetLights();
 
 	ColorRGB finalColor{};
 
@@ -157,10 +151,10 @@ void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float 
 	const float screenSpaceY = (1.0f - (2.0f * ((py + 0.5f) / m_Height))) * fov;
 
 	Vector3 rayDirection{ screenSpaceX, screenSpaceY, 1.f };
-	rayDirection = cameraToWorld.TransformVector(rayDirection);
+	rayDirection = camera.cameraToWorld.TransformVector(rayDirection);
 	rayDirection.Normalize();
 
-	Ray hitRay{ cameraOrigin, rayDirection };
+	const Ray hitRay{ camera.origin, rayDirection };
 
 	//calculate closest hit to visualize the objects in 3D space
 	HitRecord closestHit{};
@@ -172,9 +166,9 @@ void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float 
 		Vector3 rayOrigin{ closestHit.origin };
 		rayOrigin += closestHit.normal * 0.0001f;
 
-		for (const auto& light : lights)
+		for (const auto& lights : light)
 		{
-			Vector3 directionToLight = LightUtils::GetDirectionToLight(light, rayOrigin);
+			Vector3 directionToLight = LightUtils::GetDirectionToLight(lights, rayOrigin);
 			const float distanceToLight = directionToLight.Normalize();
 			if (m_ShadowEnabled)
 			{
@@ -186,7 +180,7 @@ void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float 
 				}
 			}
 
-			float observedArea{ Vector3::Dot(closestHit.normal, directionToLight) };
+			const float observedArea{ Vector3::Dot(closestHit.normal, directionToLight) };
 
 			switch (m_CurrentLightingMode)
 			{
@@ -197,17 +191,17 @@ void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float 
 				}
 				break;
 			case dae::Renderer::LightingMode::radiance:
-				finalColor += LightUtils::GetRadiance(light, closestHit.origin);
+				finalColor += LightUtils::GetRadiance(lights, closestHit.origin);
 				break;
 			case dae::Renderer::LightingMode::BRDF:
-				finalColor += materials[closestHit.materialIndex]->Shade(closestHit, directionToLight, rayDirection);
+				finalColor += material[closestHit.materialIndex]->Shade(closestHit, directionToLight, rayDirection);
 				break;
 			case dae::Renderer::LightingMode::combined:
 				if (observedArea > 0.f)
 				{
 					finalColor +=
-						LightUtils::GetRadiance(light, closestHit.origin) *
-						materials[closestHit.materialIndex]->Shade(closestHit, directionToLight, rayDirection) *
+						LightUtils::GetRadiance(lights, closestHit.origin) *
+						material[closestHit.materialIndex]->Shade(closestHit, directionToLight, rayDirection) *
 						observedArea;
 				}
 
